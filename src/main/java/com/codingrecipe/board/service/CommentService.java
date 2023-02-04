@@ -42,4 +42,16 @@ public class CommentService {
         return commentDTOList;
     }
 
+    public CommentDTO findCommentById(Long boardId, Long commentId) {
+        CommentEntity commentEntity = commentRepository.findById(commentId).get();
+
+        return CommentDTO.toCommentDTO(commentEntity, boardId);
+    }
+
+    public void delete(Long id) {
+        commentRepository.deleteById(id);
+    }
+
+
+
 }

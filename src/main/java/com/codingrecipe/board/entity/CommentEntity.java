@@ -21,6 +21,9 @@ public class CommentEntity extends BaseEntity {
     @Column
     private String commentContents;
 
+    @Column
+    private String commentPassword;
+
     /* Board:Comment = 1:N */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
@@ -30,6 +33,7 @@ public class CommentEntity extends BaseEntity {
     public static CommentEntity toSaveEntity(CommentDTO commentDTO, BoardEntity boardEntity) {
         CommentEntity commentEntity = new CommentEntity();
         commentEntity.setCommentWriter(commentDTO.getCommentWriter());
+        commentEntity.setCommentPassword(commentDTO.getCommentPassword());
         commentEntity.setCommentContents(commentDTO.getCommentContents());
         commentEntity.setBoardEntity(boardEntity);
         return commentEntity;

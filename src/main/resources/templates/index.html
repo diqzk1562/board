@@ -4,35 +4,22 @@
 <head>
     <meta charset="UTF-8">
     <title>index</title>
-
 </head>
 
-<!--    <table>-->
-<!--        <tr>-->
-<!--            <th>번호</th>-->
-<!--            <th>제목</th>-->
-<!--            &lt;!&ndash;        <th>title(||쓰지 않은 경우)</th>&ndash;&gt;-->
-<!--            <th>작성자</th>-->
-<!--            <th>작성일</th>-->
-<!--            <th>조회수</th>-->
-<!--        </tr>-->
-<!--        <tr th:each="board: ${boardList}">-->
-<!--            <td th:text="${board.id}"></td>-->
-<!--            <td><a th:href="@{|/board/${board.id}|}" th:text="${board.boardTitle}"></a></td>-->
-<!--            &lt;!&ndash;        <td><a th:href="@{/board/${board.id}}" th:text="${board.boardTitle}"></a></td>&ndash;&gt;-->
-<!--            <td th:text="${board.boardWriter}"></td>-->
-<!--            <td th:text="*{#temporals.format(board.boardCreatedTime, 'yyyy-MM-dd HH:mm:ss')}"></td>-->
-<!--            <td th:text="${board.boardHits}"></td>-->
-<!--        </tr>-->
-<!--    </table>-->
+<link rel="stylesheet" href="/css/index.css">
 
-    <div class="board-list">
-        <div th:each="board: ${boardSortList}">
-            <a th:href="@{|/board/${board}|}" th:text="${board}"></a>
-        </div>
+<body>
+
+<div class="container">
+    <div class="item" th:each="board: ${boardSortList}">
+        <h4> <a th:href="@{|/board/${board}|}" th:text="${board}"></a> </h4>
     </div>
+</div>
+
+
 
 </body>
+
 <script>
 
 </script>

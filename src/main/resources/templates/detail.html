@@ -6,30 +6,32 @@
     <!-- jquery cdn -->
     <script src="https://code.jquery.com/jquery-3.6.3.min.js" integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
 </head>
+<link rel="stylesheet" href="/css/detail.css">
 <body>
+
 <table>
     <tr>
-        <th>id</th>
+        <th>번호</th>
         <td th:text="${board.id}"></td>
     </tr>
     <tr>
-        <th>title</th>
+        <th>제목</th>
         <td th:text="${board.boardTitle}"></td>
     </tr>
     <tr>
-        <th>writer</th>
+        <th>작성자</th>
         <td th:text="${board.boardWriter}"></td>
     </tr>
     <tr>
-        <th>date</th>
+        <th>작성일</th>
         <td th:text="${board.boardCreatedTime}"></td>
     </tr>
     <tr>
-        <th>hits</th>
+        <th>조회수</th>
         <td th:text="${board.boardHits}"></td>
     </tr>
     <tr>
-        <th>contents</th>
+        <th>내용</th>
         <td th:text="${board.boardContents}"></td>
     </tr>
     <tr th:if="${board.fileAttached == 1}">
@@ -45,7 +47,8 @@
 
 <!-- 댓글 작성 부분 -->
 <div id="comment-write">
-    <input type="text" id="commentWriter" placeholder="작성자">
+    <input type="text" id="commentWriter" placeholder="닉네임">
+    <input type="password" id="commentPassword" placeholder="비밀번호">
     <input type="text" id="commentContents" placeholder="내용">
     <button id="comment-write-btn" onclick="commentWrite()">댓글작성</button>
 </div>
@@ -64,6 +67,7 @@
             <td th:text="${comment.commentWriter}"></td>
             <td th:text="${comment.commentContents}"></td>
             <td th:text="${comment.commentCreatedTime}"></td>
+            <td><button th:attr="onclick=|deleteCommentReq('${comment.id}')|">삭제</button></td>
         </tr>
     </table>
 </div>
@@ -72,16 +76,20 @@
 <script th:inline="javascript">
     const commentWrite = () => {
         const writer = document.getElementById("commentWriter").value;
+        const password = document.getElementById("commentPassword").value;
         const contents = document.getElementById("commentContents").value;
+        const boardSort = [[${board.boardSort}]];
         console.log("작성자: ", writer);
+        console.log("비밀번호: ", password);
         console.log("내용: ", contents);
         const id = [[${board.id}]];
         $.ajax({
            // 요청방식: post, 요청주소: /comment/save, 요청데이터: 작성자, 작성내용, 게시글번호
            type: "post",
-           url: "/comment/save",
+           url: "/comment/" + boardSort + "/save",
            data: {
                "commentWriter": writer,
+               "commentPassword": password,
                "commentContents": contents,
                "boardId": id
            },
@@ -98,12 +106,14 @@
                    output += "<td>" + res[i].commentWriter + "</td>";
                    output += "<td>" + res[i].commentContents + "</td>";
                    output += "<td>" + res[i].commentCreatedTime + "</td>";
+                   output += "<td><button onclick=\onclick=deleteCommentReq(" + res[i].id + ")\>삭제</button></td>";
                    output += "</tr>";
                }
                output += "</table>";
                document.getElementById('comment-list').innerHTML = output;
                document.getElementById('commentWriter').value = '';
                document.getElementById('commentContents').value = '';
+               document.getElementById('commentPassword').value= '';
            },
            error: function (err) {
                console.log("요청실패", err);
@@ -129,5 +139,44 @@
         const boardSort = [[${board.boardSort}]];
         location.href = "/board/" + boardSort + "/delete/" + id;
     }
+
+    const deleteCommentReq = (commentId) => {
+        const password = prompt("패스워드를 입력하세요");
+        const boardSort = [[${board.boardSort}]]
+        const boardId = [[${board.id}]];
+
+        $.ajax({
+            type: "post",
+            url: "/comment/" + boardSort + "/delete",
+            data: {
+                "boardId" : boardId,
+                "commentId" : commentId,
+                "password" : password
+            },
+            success: function (res) {
+                console.log("삭제 성공", res);
+                let output = "<table>";
+                output += "<tr><th>댓글번호</th>";
+                output += "<th>작성자</th>";
+                output += "<th>내용</th>";
+                output += "<th>작성시간</th></tr>";
+                for (let i in res) {
+                    output += "<tr>";
+                    output += "<td>" + res[i].id + "</td>";
+                    output += "<td>" + res[i].commentWriter + "</td>";
+                    output += "<td>" + res[i].commentContents + "</td>";
+                    output += "<td>" + res[i].commentCreatedTime + "</td>";
+                    output += "<td><button onclick=\onclick=deleteCommentReq(" + res[i].id + ")\>삭제</button></td>";
+                    output += "</tr>";
+                }
+                output += "</table>";
+                document.getElementById('comment-list').innerHTML = output;
+            },
+            error: function (err) {
+                console.log("삭제 실패", err);
+            }
+        });
+    }
+
 </script>
 </html>

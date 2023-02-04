@@ -14,6 +14,7 @@ public class CommentDTO {
     private Long id;
     private String commentWriter;
     private String commentContents;
+    private String commentPassword;
     private Long boardId;
     private LocalDateTime commentCreatedTime;
 
@@ -22,6 +23,7 @@ public class CommentDTO {
         commentDTO.setId(commentEntity.getId());
         commentDTO.setCommentWriter(commentEntity.getCommentWriter());
         commentDTO.setCommentContents(commentEntity.getCommentContents());
+        commentDTO.setCommentPassword(commentEntity.getCommentPassword());
         commentDTO.setCommentCreatedTime(commentEntity.getCreatedTime());
         commentDTO.setBoardId(boardId);
         return commentDTO;
