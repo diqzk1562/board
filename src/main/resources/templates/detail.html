@@ -57,17 +57,24 @@
 <div id="comment-list">
     <table>
         <tr>
-            <th>댓글번호</th>
+<!--            <th>댓글번호</th>-->
             <th>작성자</th>
             <th>내용</th>
             <th>작성시간</th>
+            <th></th>
         </tr>
-        <tr th:each="comment: ${commentList}">
-            <td th:text="${comment.id}"></td>
+        <tr th:each="comment, commentStat: ${commentList}">
+<!--            <td th:text="${comment.id}"></td>-->
             <td th:text="${comment.commentWriter}"></td>
             <td th:text="${comment.commentContents}"></td>
             <td th:text="${comment.commentCreatedTime}"></td>
-            <td><button th:attr="onclick=|deleteCommentReq('${comment.id}')|">삭제</button></td>
+            <td><button th:attr="onclick=|deleteCommentReq(${commentStat.index})|">삭제</button></td>
+            <td>
+                <div style="display:none" th:id='|deleteBox${commentStat.index}|'>
+                    <input type='password' th:id='|deletePassword${commentStat.index}|' placeholder="비밀번호">
+                    <input type='button' value='삭제' th:onclick='|deleteComment(${comment.id}, ${commentStat.index})|'>
+                </div>
+            </td>
         </tr>
     </table>
 </div>
@@ -96,17 +103,23 @@
            success: function (res) {
                console.log("요청성공", res);
                let output = "<table>";
-               output += "<tr><th>댓글번호</th>";
+               // output += "<tr><th>댓글번호</th>";
                output += "<th>작성자</th>";
                output += "<th>내용</th>";
                output += "<th>작성시간</th></tr>";
+               output += "<th></th>";
                for (let i in res) {
                    output += "<tr>";
-                   output += "<td>" + res[i].id + "</td>";
+                   // output += "<td>" + res[i].id + "</td>";
                    output += "<td>" + res[i].commentWriter + "</td>";
                    output += "<td>" + res[i].commentContents + "</td>";
                    output += "<td>" + res[i].commentCreatedTime + "</td>";
-                   output += "<td><button onclick=\onclick=deleteCommentReq(" + res[i].id + ")\>삭제</button></td>";
+                   output += "<td><button onclick=\onclick=deleteCommentReq("+ i + ")\>삭제</button></td>";
+                   output += "<td><div style='display:none' id='deleteBox" + i + "'>" +
+                   "<input type='password' id='deletePassword" + i + "' placeholder='비밀번호'>" +
+                   "<input type='button' value='삭제' onClick='deleteComment(" + res[i].id + ", " + i + ")'>" +
+                   "</div></td>"
+
                    output += "</tr>";
                }
                output += "</table>";
@@ -140,8 +153,23 @@
         location.href = "/board/" + boardSort + "/delete/" + id;
     }
 
-    const deleteCommentReq = (commentId) => {
-        const password = prompt("패스워드를 입력하세요");
+    const deleteCommentReq = (index) => {
+        const size = 10;
+        for(let i = 0; i < size; i++) {
+            let tempElement = document.getElementById("deleteBox"+i);
+            if(tempElement == null) break;
+            else tempElement.style.setProperty("display", "none");
+        }
+
+        const style = document.getElementById("deleteBox"+index).style;
+        if(style.getPropertyValue("display") == "none") {
+            style.setProperty("display", "block");
+        }
+        else style.setProperty("display", "none");
+    }
+
+    const deleteComment = (commentId, index) => {
+        const password = document.getElementById('deletePassword'+index).value;
         const boardSort = [[${board.boardSort}]]
         const boardId = [[${board.id}]];
 
@@ -156,17 +184,22 @@
             success: function (res) {
                 console.log("삭제 성공", res);
                 let output = "<table>";
-                output += "<tr><th>댓글번호</th>";
+                // output += "<tr><th>댓글번호</th>";
                 output += "<th>작성자</th>";
                 output += "<th>내용</th>";
                 output += "<th>작성시간</th></tr>";
+                output += "<th></th>"
                 for (let i in res) {
                     output += "<tr>";
-                    output += "<td>" + res[i].id + "</td>";
+                    // output += "<td>" + res[i].id + "</td>";
                     output += "<td>" + res[i].commentWriter + "</td>";
                     output += "<td>" + res[i].commentContents + "</td>";
                     output += "<td>" + res[i].commentCreatedTime + "</td>";
-                    output += "<td><button onclick=\onclick=deleteCommentReq(" + res[i].id + ")\>삭제</button></td>";
+                    output += "<td><button onclick=\onclick=deleteCommentReq("+ i + ")\>삭제</button></td>";
+                    output += "<td><div style='display:none' id='deleteBox" + i + "'>" +
+                        "<input type='password' id='deletePassword" + i + "' placeholder='비밀번호'>" +
+                        "<input type='button' value='삭제' onClick='deleteComment(" + res[i].id + ", " + i + ")'>" +
+                        "</div></td>"
                     output += "</tr>";
                 }
                 output += "</table>";
